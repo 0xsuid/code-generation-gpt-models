@@ -107,6 +107,9 @@ default_args = {
     "num_train_epochs": 5,
     "per_device_train_batch_size": 2,
     
+    # Default "adamw_hf" is deprecated
+    "optim": "adamw_torch",
+    
     # The idea behind gradient accumulation is to instead of calculating the gradients for the whole batch at once to do it in smaller steps. 
     # The way we do that is to calculate the gradients iteratively in smaller batches by doing a forward and backward pass through the model and accumulating the gradients in the process. 
     # When enough gradients are accumulated we run the model’s optimization step. This way we can easily increase the overall batch size to numbers that would never fit into the GPU’s memory. 
