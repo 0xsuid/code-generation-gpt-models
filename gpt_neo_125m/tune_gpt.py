@@ -4,6 +4,7 @@ import pandas as pd
 from pynvml import *
 # from urllib import parse
 from datasets import load_dataset
+from argparse import ArgumentParser
 from torch.utils.data import Dataset, random_split
 from transformers import AutoTokenizer, TrainingArguments, Trainer, AutoModelForCausalLM, logging
 
@@ -31,6 +32,11 @@ def format_input(dataset):
         return formatted_dataset
 
 
+parser = ArgumentParser()
+parser.add_argument("-l", "--limit", dest="limit", default=0, type=int,
+                    help="Limit Total no. of problems", metavar="N")
+args = parser.parse_args()
+
 # torch.manual_seed(42)
 tokenizer = AutoTokenizer.from_pretrained("EleutherAI/gpt-neo-125M", 
                                             bos_token='<|startoftext|>',
@@ -40,7 +46,10 @@ model = AutoModelForCausalLM.from_pretrained("EleutherAI/gpt-neo-125M").cuda()
 model.resize_token_embeddings(len(tokenizer))
 
 raw_ds = load_dataset("codeparrot/apps", split="train")
+if(args.limit > 0):
+    raw_ds = [x for _, x in zip(range(args.limit), ds)]
 coding_problems = format_input(raw_ds)
+
 max_length = max([len(tokenizer.encode(coding_problem)) for coding_problem in coding_problems])
 print("Max length: {}".format(max_length))
 
