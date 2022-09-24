@@ -35,6 +35,9 @@ def format_input(dataset):
 parser = ArgumentParser()
 parser.add_argument("-l", "--limit", dest="limit", default=0, type=int,
                     help="Limit Total no. of problems", metavar="N")
+parser.add_argument("-v", "--verbosity", dest="verbosity", default="info", 
+                    choices=["info","error"],
+                    help="Verbosity", metavar="V")
 args = parser.parse_args()
 
 # torch.manual_seed(42)
@@ -52,6 +55,7 @@ coding_problems = format_input(raw_ds)
 
 max_length = max([len(tokenizer.encode(coding_problem)) for coding_problem in coding_problems])
 model_max_length = model.config.max_position_embeddings
+# Reset max_length to maximum model length if it exceeds. 
 max_length = max_length if max_length <= model_max_length else model_max_length
 print("Max length: {}".format(max_length))
 
@@ -62,6 +66,8 @@ class AppsDataset(Dataset):
         self.attn_masks = []
         self.labels = []
         for txt in txt_list:
+            # truncation is required to avoid following issue
+            # https://github.com/huggingface/transformers/issues/1791
             encodings_dict = tokenizer('<|startoftext|>' + txt + '<|endoftext|>', 
                                         truncation=True,
                                         max_length=max_length, 
@@ -80,9 +86,11 @@ train_dataset = AppsDataset(coding_problems, tokenizer, max_length=max_length)
 save_dir = './results'
 
 # Logging - https://huggingface.co/docs/transformers/main_classes/logging
-# TRANSFORMERS_VERBOSITY=error ./tune_gpt.py
-logging.set_verbosity_error()
-# logging.set_verbosity_info()
+if(args.verbosity == "info"):
+    logging.set_verbosity_info()
+elif(args.verbosity == "error"):
+    logging.set_verbosity_error()
+
 
 default_args = {
     "output_dir": save_dir, 
