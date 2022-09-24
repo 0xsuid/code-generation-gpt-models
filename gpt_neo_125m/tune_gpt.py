@@ -51,6 +51,8 @@ if(args.limit > 0):
 coding_problems = format_input(raw_ds)
 
 max_length = max([len(tokenizer.encode(coding_problem)) for coding_problem in coding_problems])
+model_max_length = model.config.max_position_embeddings
+max_length = max_length if max_length <= model_max_length else model_max_length
 print("Max length: {}".format(max_length))
 
 
