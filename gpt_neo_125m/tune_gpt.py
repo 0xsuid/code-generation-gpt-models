@@ -47,7 +47,7 @@ model.resize_token_embeddings(len(tokenizer))
 
 raw_ds = load_dataset("codeparrot/apps", split="train")
 if(args.limit > 0):
-    raw_ds = [x for _, x in zip(range(args.limit), ds)]
+    raw_ds = [x for _, x in zip(range(args.limit), raw_ds)]
 coding_problems = format_input(raw_ds)
 
 max_length = max([len(tokenizer.encode(coding_problem)) for coding_problem in coding_problems])
@@ -74,7 +74,7 @@ class AppsDataset(Dataset):
         return self.input_ids[idx], self.attn_masks[idx]
 
 
-train_dataset = AppsDataset(descriptions, tokenizer, max_length=max_length)
+train_dataset = AppsDataset(coding_problems, tokenizer, max_length=max_length)
 save_dir = './results'
 
 # Logging - https://huggingface.co/docs/transformers/main_classes/logging
