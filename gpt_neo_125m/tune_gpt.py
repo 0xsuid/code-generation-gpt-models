@@ -178,7 +178,7 @@ final_save_dir = today+calulated_hash
 os.makedirs(today+calulated_hash,exist_ok=True)
 
 with open(os.path.join(final_save_dir, 'configs.json'), 'w') as f:
-    json.dump(all_configs, f, ensure_ascii=False)
+    json.dump(all_configs, f, indent=4, ensure_ascii=False)
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 output_file = "output.log"
