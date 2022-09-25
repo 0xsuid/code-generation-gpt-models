@@ -1,7 +1,12 @@
 import json
 import torch
+import psutil
+import shutil
 import pandas as pd
 from pynvml import *
+from os import makedirs
+from datetime import date
+from hashlib import sha256
 # from urllib import parse
 from datasets import load_dataset
 from argparse import ArgumentParser
@@ -40,7 +45,7 @@ parser.add_argument("-v", "--verbosity", dest="verbosity", default="info",
                     help="Verbosity", metavar="V")
 args = parser.parse_args()
 
-# torch.manual_seed(42)
+
 tokenizer = AutoTokenizer.from_pretrained("EleutherAI/gpt-neo-125M", 
                                             bos_token='<|startoftext|>',
                                             eos_token='<|endoftext|>', 
@@ -53,7 +58,7 @@ if(args.limit > 0):
     raw_ds = [x for _, x in zip(range(args.limit), raw_ds)]
 coding_problems = format_input(raw_ds)
 
-max_length = max([len(tokenizer.encode(coding_problem)) for coding_problem in coding_problems])
+max_length = max([len(tokenizer.encode(coding_problem, verbose=False)) for coding_problem in coding_problems])
 model_max_length = model.config.max_position_embeddings
 # Reset max_length to maximum model length if it exceeds. 
 max_length = max_length if max_length <= model_max_length else model_max_length
@@ -155,4 +160,28 @@ print_gpu_utilization()
 result = trainer.train()
 print_summary(result)
 
-model.save_pretrained(os.path.join(save_dir, "final_checkpoint"))
+device_info = {
+    "total_gpus": torch.cuda.device_count(),
+    "v_cpus": psutil.cpu_count(),
+    "total_memory_in_gb": psutil.virtual_memory().total/(1024*1024)
+}
+other_info= {
+    "dataset_limit": args.limit,
+}
+
+all_configs = {**default_args,**device_info,**other_info}
+configs_json = json.dumps(all_configs,sort_keys=True).encode('utf8')
+calulated_hash = sha256(configs_json).hexdigest()
+today = str(date.today())
+final_save_dir = today+calulated_hash
+
+os.makedirs(today+calulated_hash,exist_ok=True)
+
+with open(os.path.join(final_save_dir, 'configs.json'), 'w') as f:
+    json.dump(all_configs, f, ensure_ascii=False)
+
+dir_path = os.path.dirname(os.path.realpath(__file__))
+output_file = "output.log"
+shutil.move(os.path.join(dir_path, output_file), os.path.join(final_save_dir, output_file))
+
+model.save_pretrained(os.path.join(final_save_dir, "final_checkpoint"))
