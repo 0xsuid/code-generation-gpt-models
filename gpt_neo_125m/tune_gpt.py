@@ -173,7 +173,7 @@ all_configs = {**default_args,**device_info,**other_info}
 configs_json = json.dumps(all_configs,sort_keys=True).encode('utf8')
 calulated_hash = sha256(configs_json).hexdigest()
 today = str(date.today())
-final_save_dir = today+calulated_hash
+final_save_dir = today+"-"+calulated_hash
 
 os.makedirs(today+calulated_hash,exist_ok=True)
 
