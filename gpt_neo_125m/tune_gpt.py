@@ -175,7 +175,7 @@ calulated_hash = sha256(configs_json).hexdigest()
 today = str(date.today())
 final_save_dir = today+"-"+calulated_hash
 
-os.makedirs(today+calulated_hash,exist_ok=True)
+os.makedirs(final_save_dir,exist_ok=True)
 
 with open(os.path.join(final_save_dir, 'configs.json'), 'w') as f:
     json.dump(all_configs, f, indent=4, ensure_ascii=False)
