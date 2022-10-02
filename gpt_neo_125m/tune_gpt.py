@@ -2,12 +2,14 @@ import json
 import torch
 import psutil
 import shutil
+import requests
 import pandas as pd
 from pynvml import *
 from os import makedirs
 from datetime import date
 from hashlib import sha256
 # from urllib import parse
+from dotenv import load_dotenv
 from datasets import load_dataset
 from argparse import ArgumentParser
 from torch.utils.data import Dataset, random_split
@@ -36,15 +38,26 @@ def format_input(dataset):
                         formatted_dataset.append(str_format + answer)
         return formatted_dataset
 
+def stop_tensordock_instance(api_key, api_token, server_id):
+    req = requests.get(f"https://console.tensordock.com/api/stop/single?api_key={api_key}&api_token={api_token}&server={server_id}")
+    return r.content
 
+# Parse Arguments
 parser = ArgumentParser()
 parser.add_argument("-l", "--limit", dest="limit", default=0, type=int,
                     help="Limit Total no. of problems", metavar="N")
+parser.add_argument("-stop", "--stop-instance", dest="stop_instance", action="store_true",
+                    help="Stop tensordock instance after training")
 parser.add_argument("-v", "--verbosity", dest="verbosity", default="info", 
                     choices=["info","error"],
                     help="Verbosity", metavar="V")
 args = parser.parse_args()
 
+# load environment variables from .env
+load_dotenv()  
+td_api_key = os.getenv("TD_API_KEY")
+td_api_token = os.getenv("TD_API_TOKEN")
+td_server_id = os.getenv("TD_SERVER_ID")
 
 tokenizer = AutoTokenizer.from_pretrained("EleutherAI/gpt-neo-125M", 
                                             bos_token='<|startoftext|>',
@@ -173,15 +186,19 @@ all_configs = {**default_args,**device_info,**other_info}
 configs_json = json.dumps(all_configs,sort_keys=True).encode('utf8')
 calulated_hash = sha256(configs_json).hexdigest()
 today = str(date.today())
-final_save_dir = today+"-"+calulated_hash
+final_save_dir = os.path.join("experiments", today+"-"+calulated_hash)
 
 os.makedirs(final_save_dir,exist_ok=True)
 
 with open(os.path.join(final_save_dir, 'configs.json'), 'w') as f:
     json.dump(all_configs, f, indent=4, ensure_ascii=False)
 
-dir_path = os.path.dirname(os.path.realpath(__file__))
+pwd_path = os.path.dirname(os.path.realpath(__file__))
 output_file = "output.log"
-shutil.move(os.path.join(dir_path, output_file), os.path.join(final_save_dir, output_file))
+shutil.move(os.path.join(pwd_path, output_file), os.path.join(final_save_dir, output_file))
 
 model.save_pretrained(os.path.join(final_save_dir, "final_checkpoint"))
+
+if(args.stop_instance):
+    if(td_api_key and td_api_token and td_server_id):
+        stop_tensordock_instance(td_api_key, td_api_token, td_server_id)
