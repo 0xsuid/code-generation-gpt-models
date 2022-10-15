@@ -194,8 +194,13 @@ with open(os.path.join(final_save_dir, 'configs.json'), 'w') as f:
     json.dump(all_configs, f, indent=4, ensure_ascii=False)
 
 pwd_path = os.path.dirname(os.path.realpath(__file__))
-output_file = "output.log"
-shutil.move(os.path.join(pwd_path, output_file), os.path.join(final_save_dir, output_file))
+
+# Move python stdout log "output.log" to final_save_dir
+shutil.move(os.path.join(pwd_path, "output.log"), os.path.join(final_save_dir))
+
+# Move Tensor logs to final_save_dir
+shutil.move(os.path.join(pwd_path, "logs"), os.path.join(final_save_dir))
+
 
 model.save_pretrained(os.path.join(final_save_dir, "final_checkpoint"))
 

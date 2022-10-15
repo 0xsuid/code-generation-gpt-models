@@ -9,11 +9,15 @@ Fine-Tuning GPT NEO 125M for code generation
 ```bash
 nohup python3 tune_gpt.py --limit 10 > output.log 2>&1 &
 ```
+## Logs Visualization with Tensorboard
 
+```
+tensorboard --logdir experiments/2022-10-15-9e416bbdeafeaea88e8747a0edd284f93d7551ea3cc387377269ceed52957730/logs
+```
 ## Recommendation
 
 ```bash
-pip install pandas transformers datasets accelerate nvidia-ml-py3
+pip install pandas transformers datasets accelerate nvidia-ml-py3 dotenv
 ```
 
 ## References
