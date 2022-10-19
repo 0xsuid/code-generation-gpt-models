@@ -1,2 +1,5 @@
 .env
-results
+output.log
+results/
+experiments/*
+!experiments/.gitkeep 
