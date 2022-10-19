@@ -9,6 +9,17 @@ Fine-Tuning GPT NEO 125M for code generation
 ```bash
 nohup python3 tune_gpt.py --limit 10 > output.log 2>&1 &
 ```
+
+## Supported Arguments:
+
+1. Limit
+    - "--limit" - "Limit Total no. of problems"
+2. Upload Model
+    - "--upload-model" - "Upload fine-tuned model to Huggingface"
+3. Stop
+    - "--stop-instance" - "Stop tensordock instance after training"
+4. Verbosity
+    - "--verbosity"
 ## Logs Visualization with Tensorboard
 
 ```

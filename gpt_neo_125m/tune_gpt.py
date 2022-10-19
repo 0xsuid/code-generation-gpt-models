@@ -11,6 +11,7 @@ from hashlib import sha256
 # from urllib import parse
 from dotenv import load_dotenv
 from datasets import load_dataset
+from huggingface_hub import HfApi
 from argparse import ArgumentParser
 from torch.utils.data import Dataset, random_split
 from transformers import AutoTokenizer, TrainingArguments, Trainer, AutoModelForCausalLM, logging
@@ -46,6 +47,8 @@ def stop_tensordock_instance(api_key, api_token, server_id):
 parser = ArgumentParser()
 parser.add_argument("-l", "--limit", dest="limit", default=0, type=int,
                     help="Limit Total no. of problems", metavar="N")
+parser.add_argument("-upload", "--upload-model", dest="upload_model", action="store_true",
+                    help="Upload fine-tuned model to Huggingface")
 parser.add_argument("-stop", "--stop-instance", dest="stop_instance", action="store_true",
                     help="Stop tensordock instance after training")
 parser.add_argument("-v", "--verbosity", dest="verbosity", default="info", 
@@ -58,6 +61,8 @@ load_dotenv()
 td_api_key = os.getenv("TD_API_KEY")
 td_api_token = os.getenv("TD_API_TOKEN")
 td_server_id = os.getenv("TD_SERVER_ID")
+huggingface_token = os.getenv("HF_TOKEN")
+huggingface_repo_id = os.getenv("HF_REPO_ID")
 
 tokenizer = AutoTokenizer.from_pretrained("EleutherAI/gpt-neo-125M", 
                                             bos_token='<|startoftext|>',
@@ -201,8 +206,20 @@ shutil.move(os.path.join(pwd_path, "output.log"), os.path.join(final_save_dir))
 # Move Tensor logs to final_save_dir
 shutil.move(os.path.join(pwd_path, "logs"), os.path.join(final_save_dir))
 
-
 model.save_pretrained(os.path.join(final_save_dir, "final_checkpoint"))
+
+if(args.upload_model 
+   and huggingface_token
+   and huggingface_repo_id):
+    api = HfApi()
+    api.upload_folder(
+        folder_path=final_save_dir,
+        path_in_repo=final_save_dir,
+        repo_id=huggingface_repo_id,
+        token=huggingface_token,
+        # ignore_patterns="",
+    )
+
 
 if(args.stop_instance):
     if(td_api_key and td_api_token and td_server_id):
