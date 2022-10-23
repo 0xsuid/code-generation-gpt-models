@@ -40,6 +40,15 @@ pip install torch torchvision torchaudio --extra-index-url https://download.pyto
 
 ## Nvidia Drivers - Optional
 
+Optional - Remove previously installed nvidia driver
+
+```bash
+sudo apt clean
+sudo apt update
+sudo apt purge nvidia-* 
+sudo apt autoremove
+```
+
 nvidia driver version 510 will provide -> CUDA 11.6
 
 ```bash
