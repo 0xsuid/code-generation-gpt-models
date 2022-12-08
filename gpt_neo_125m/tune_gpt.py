@@ -51,6 +51,10 @@ parser.add_argument("-upload", "--upload-model", dest="upload_model", action="st
                     help="Upload fine-tuned model to Huggingface")
 parser.add_argument("-stop", "--stop-instance", dest="stop_instance", action="store_true",
                     help="Stop tensordock instance after training")
+parser.add_argument("-lr", "--local_rank", dest="local_rank",
+                    help="local rank")
+parser.add_argument("-ds", "--deepspeed", dest="deepspeed",
+                    help="deepspeed")
 parser.add_argument("-v", "--verbosity", dest="verbosity", default="info", 
                     choices=["info","error"],
                     help="Verbosity", metavar="V")
@@ -160,10 +164,11 @@ default_args = {
     # The weight decay to apply (if not zero) to all layers except all bias and LayerNorm weights in AdamW optimizer.
     "weight_decay": 0.01, 
     # The initial learning rate for AdamW optimizer.
-    "learning_rate": 5e-5,
+    "learning_rate": 1e-5,
     
     # we can reduce the precision the variales and their computations are faster. 
-    "fp16": True
+    "fp16": True,
+    "deepspeed": True
 }
 training_args = TrainingArguments(**default_args)
 trainer = Trainer(model=model, 

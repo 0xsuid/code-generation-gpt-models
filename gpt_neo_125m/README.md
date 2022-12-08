@@ -12,6 +12,10 @@ Note: argument "-u" is required to disable python output buffering
 nohup python3 -u tune_gpt.py --limit 10 > output.log 2>&1 &
 ```
 
+```bash
+deepspeed --num_gpus=1 tune_gpt.py  --deepspeed deepspeed.json
+```
+
 ## Supported Arguments:
 
 1. Limit
