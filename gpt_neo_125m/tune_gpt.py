@@ -15,8 +15,8 @@ from huggingface_hub import HfApi
 from argparse import ArgumentParser
 from torch.utils.data import Dataset, random_split
 from transformers import AutoTokenizer, TrainingArguments, Trainer, AutoModelForCausalLM, logging
-import deepspeed
-deepspeed.ops.adam.cpu_adam.CPUAdamBuilder().load()
+# import deepspeed
+# deepspeed.ops.adam.cpu_adam.CPUAdamBuilder().load()
 
 def print_gpu_utilization():
     nvmlInit()
@@ -154,7 +154,7 @@ default_args = {
     
     # Total number of training epochs to perform
     "num_train_epochs": 5,
-    "per_device_train_batch_size": 2,
+    "per_device_train_batch_size": 7,
     
     # Default "adamw_hf" is deprecated
     "optim": "adamw_torch",
@@ -163,7 +163,7 @@ default_args = {
     # The way we do that is to calculate the gradients iteratively in smaller batches by doing a forward and backward pass through the model and accumulating the gradients in the process. 
     # When enough gradients are accumulated we run the model’s optimization step. This way we can easily increase the overall batch size to numbers that would never fit into the GPU’s memory. 
     # In turn, however, the added forward and backward passes can slow down the training a bit.
-    "gradient_accumulation_steps": 4,
+    # "gradient_accumulation_steps": 4,
     
     # In order to compute the gradients during the backward pass all activations from the forward pass are normally saved. 
     # This can create a big memory overhead. Alternatively, one could forget all activations during the forward pass and recompute them on demand during the backward pass. 
@@ -178,7 +178,7 @@ default_args = {
     # The weight decay to apply (if not zero) to all layers except all bias and LayerNorm weights in AdamW optimizer.
     "weight_decay": 0.01, 
     # The initial learning rate for AdamW optimizer.
-    "learning_rate": 1e-5,
+    "learning_rate": 1e-4,
     
     # we can reduce the precision the variales and their computations are faster. 
     "fp16": True,
