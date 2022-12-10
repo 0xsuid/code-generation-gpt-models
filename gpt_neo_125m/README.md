@@ -71,6 +71,24 @@ After driver installation Force reinstall  pytorch
 pip3 install torch torchvision torchaudio --force-reinstall --extra-index-url https://download.pytorch.org/whl/cu116
 ```
 
+If error "deepspeed: command not found" is visible after installation - faced on ubuntu 20:
+
+```bash
+nano ~/.bashrc
+```
+
+Save following at end of file
+
+```bash
+export PATH="/home/user/.local/bin:$PATH"
+```
+
+You will then need to profile, do this by either running the command:
+
+```bash
+source ~/.bash_profile
+```
+
 ## Labels
 
 we pass the input data as the label instead of just the answer labels. This is because we are training a language model, hence we want the model to learn the pattern of the prompt and not just answer class. In a sense, the model learns to predict the words of the input question + answer structured in the prompt, and in the process learn the code generation task.
