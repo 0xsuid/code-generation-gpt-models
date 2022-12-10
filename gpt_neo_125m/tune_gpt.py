@@ -15,6 +15,8 @@ from huggingface_hub import HfApi
 from argparse import ArgumentParser
 from torch.utils.data import Dataset, random_split
 from transformers import AutoTokenizer, TrainingArguments, Trainer, AutoModelForCausalLM, logging
+import deepspeed
+deepspeed.ops.adam.cpu_adam.CPUAdamBuilder().load()
 
 def print_gpu_utilization():
     nvmlInit()
@@ -53,8 +55,8 @@ parser.add_argument("-stop", "--stop-instance", dest="stop_instance", action="st
                     help="Stop tensordock instance after training")
 parser.add_argument("-lr", "--local_rank", dest="local_rank",
                     help="local rank")
-parser.add_argument("-ds", "--deepspeed", dest="deepspeed",
-                    help="deepspeed")
+parser.add_argument("-ds", "--deepspeed", dest="deepspeed", default=None, type=str,
+                    help="deepspeed config")
 parser.add_argument("-v", "--verbosity", dest="verbosity", default="info", 
                     choices=["info","error"],
                     help="Verbosity", metavar="V")
@@ -80,33 +82,45 @@ if(args.limit > 0):
     raw_ds = [x for _, x in zip(range(args.limit), raw_ds)]
 coding_problems = format_input(raw_ds)
 
-max_length = max([len(tokenizer.encode(coding_problem, verbose=False)) for coding_problem in coding_problems])
+# max_length = max([len(tokenizer.encode(coding_problem, verbose=False)) for coding_problem in coding_problems])
 model_max_length = model.config.max_position_embeddings
 # Reset max_length to maximum model length if it exceeds. 
-max_length = max_length if max_length <= model_max_length else model_max_length
+# max_length = max_length if max_length <= model_max_length else model_max_length
+max_length = model_max_length
 print("Max length: {}".format(max_length))
 
 
 class AppsDataset(Dataset):
     def __init__(self, txt_list, tokenizer, max_length):
+        self.coding_problems = txt_list
         self.input_ids = []
         self.attn_masks = []
         self.labels = []
-        for txt in txt_list:
-            # truncation is required to avoid following issue
-            # https://github.com/huggingface/transformers/issues/1791
-            encodings_dict = tokenizer('<|startoftext|>' + txt + '<|endoftext|>', 
-                                        truncation=True,
-                                        max_length=max_length, 
-                                        padding="max_length")
-            self.input_ids.append(torch.tensor(encodings_dict['input_ids']))
-            self.attn_masks.append(torch.tensor(encodings_dict['attention_mask']))
+        # for txt in txt_list:
+        #     # truncation is required to avoid following issue
+        #     # https://github.com/huggingface/transformers/issues/1791
+        #     encodings_dict = tokenizer('<|startoftext|>' + txt + '<|endoftext|>', 
+        #                                 truncation=True,
+        #                                 max_length=max_length, 
+        #                                 padding="max_length")
+        #     self.input_ids.append(torch.tensor(encodings_dict['input_ids']))
+        #     self.attn_masks.append(torch.tensor(encodings_dict['attention_mask']))
 
     def __len__(self):
-        return len(self.input_ids)
+        return len(self.coding_problems)
 
     def __getitem__(self, idx):
-        return self.input_ids[idx], self.attn_masks[idx]
+        # truncation is required to avoid following issue
+        # https://github.com/huggingface/transformers/issues/1791
+        encodings_dict = tokenizer('<|startoftext|>' + self.coding_problems[idx] + '<|endoftext|>', 
+                                    truncation=True,
+                                    max_length=max_length, 
+                                    padding="max_length")
+        return {
+            "input_ids" : torch.tensor(encodings_dict['input_ids']),
+            "attention_mask": torch.tensor(encodings_dict['attention_mask']),
+            "labels" :  torch.tensor(encodings_dict['input_ids'])
+        }
 
 
 train_dataset = AppsDataset(coding_problems, tokenizer, max_length=max_length)
@@ -154,7 +168,7 @@ default_args = {
     # In order to compute the gradients during the backward pass all activations from the forward pass are normally saved. 
     # This can create a big memory overhead. Alternatively, one could forget all activations during the forward pass and recompute them on demand during the backward pass. 
     # This would however add a significant computational overhead and slow down training.
-    "gradient_checkpointing":True,
+    # "gradient_checkpointing":True,
     
     # Drop the last incomplete batch if it is not divisible by the batch size
     "dataloader_drop_last": True,
@@ -168,15 +182,12 @@ default_args = {
     
     # we can reduce the precision the variales and their computations are faster. 
     "fp16": True,
-    "deepspeed": True
+    "deepspeed": args.deepspeed
 }
 training_args = TrainingArguments(**default_args)
 trainer = Trainer(model=model, 
         args=training_args, 
         train_dataset=train_dataset,
-        data_collator=lambda data: {'input_ids': torch.stack([f[0] for f in data]),
-                                    'attention_mask': torch.stack([f[1] for f in data]),
-                                    'labels': torch.stack([f[0] for f in data])}
         )
 
 print_gpu_utilization()

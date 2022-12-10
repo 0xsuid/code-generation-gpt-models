@@ -44,8 +44,26 @@ pip install torch torchvision torchaudio --extra-index-url https://download.pyto
 ```
 
 ```bash
-sudo apt install nvidia-cuda-toolkit
+sudo apt install nvidia-cuda-toolkit libaio-dev
 pip install deepspeed
+```
+
+If error "deepspeed: command not found" is visible after installation - faced on ubuntu 20:
+
+```bash
+nano ~/.bashrc
+```
+
+Save following at end of file
+
+```bash
+export PATH="/home/user/.local/bin:$PATH"
+```
+
+You will then need to profile, do this by either running the command:
+
+```bash
+source ~/.bash_profile
 ```
 
 ## Nvidia Drivers - Optional
@@ -69,24 +87,6 @@ After driver installation Force reinstall  pytorch
 
 ```bash
 pip3 install torch torchvision torchaudio --force-reinstall --extra-index-url https://download.pytorch.org/whl/cu116
-```
-
-If error "deepspeed: command not found" is visible after installation - faced on ubuntu 20:
-
-```bash
-nano ~/.bashrc
-```
-
-Save following at end of file
-
-```bash
-export PATH="/home/user/.local/bin:$PATH"
-```
-
-You will then need to profile, do this by either running the command:
-
-```bash
-source ~/.bash_profile
 ```
 
 ## Labels
