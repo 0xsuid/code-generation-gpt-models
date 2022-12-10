@@ -33,39 +33,6 @@ nohup deepspeed --num_gpus=1 tune_gpt.py  --deepspeed deepspeed.json --upload-mo
 tensorboard --logdir experiments/2022-10-15-9e416bbdeafeaea88e8747a0edd284f93d7551ea3cc387377269ceed52957730/logs
 ```
 
-## Recommendation
-
-```bash
-pip install pandas transformers datasets accelerate nvidia-ml-py3 python-dotenv requests
-```
-
-```bash
-pip install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu116
-```
-
-```bash
-sudo apt install nvidia-cuda-toolkit libaio-dev
-pip install deepspeed
-```
-
-If error "deepspeed: command not found" is visible after installation - faced on ubuntu 20:
-
-```bash
-nano ~/.bashrc
-```
-
-Save following at end of file
-
-```bash
-export PATH="/home/user/.local/bin:$PATH"
-```
-
-You will then need to profile, do this by either running the command:
-
-```bash
-source ~/.bash_profile
-```
-
 ## Nvidia Drivers - Optional
 
 Optional - Remove previously installed nvidia driver
@@ -86,10 +53,43 @@ sudo apt-get update
 sudo apt install nvidia-driver-510 cuda-toolkit-11-6
 ```
 
-After driver installation Force reinstall  pytorch
+## Dependency Installation
+
+```bash
+pip install pandas transformers datasets accelerate nvidia-ml-py3 python-dotenv requests
+```
+
+```bash
+pip install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu116
+```
+
+Note: If you face any issue After driver installation then force reinstall pytorch
 
 ```bash
 pip3 install torch torchvision torchaudio --force-reinstall --extra-index-url https://download.pytorch.org/whl/cu116
+```
+
+```bash
+sudo apt install libaio-dev
+pip install deepspeed
+```
+
+If error "deepspeed: command not found" is visible after installation - faced on ubuntu 20:
+
+```bash
+nano ~/.bashrc
+```
+
+Save following at end of file
+
+```bash
+export PATH="/home/user/.local/bin:$PATH"
+```
+
+You will then need to profile, do this by either running the command:
+
+```bash
+source ~/.bash_profile
 ```
 
 ## Labels
