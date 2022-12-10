@@ -13,10 +13,10 @@ nohup python3 -u tune_gpt.py --limit 10 > output.log 2>&1 &
 ```
 
 ```bash
-deepspeed --num_gpus=1 tune_gpt.py  --deepspeed deepspeed.json
+nohup deepspeed --num_gpus=1 tune_gpt.py  --deepspeed deepspeed.json > output.log 2>&1 &
 ```
 
-## Supported Arguments:
+## Supported Arguments
 
 1. Limit
     - "--limit" - "Limit Total no. of problems"
@@ -26,9 +26,10 @@ deepspeed --num_gpus=1 tune_gpt.py  --deepspeed deepspeed.json
     - "--stop-instance" - "Stop tensordock instance after training"
 4. Verbosity
     - "--verbosity"
+
 ## Logs Visualization with Tensorboard
 
-```
+```bash
 tensorboard --logdir experiments/2022-10-15-9e416bbdeafeaea88e8747a0edd284f93d7551ea3cc387377269ceed52957730/logs
 ```
 
@@ -40,6 +41,11 @@ pip install pandas transformers datasets accelerate nvidia-ml-py3 python-dotenv 
 
 ```bash
 pip install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu116
+```
+
+```bash
+sudo apt install nvidia-cuda-toolkit
+pip install deepspeed
 ```
 
 ## Nvidia Drivers - Optional
