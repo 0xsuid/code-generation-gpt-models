@@ -60,13 +60,7 @@ pip install pandas transformers datasets accelerate nvidia-ml-py3 python-dotenv 
 ```
 
 ```bash
-pip install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu116
-```
-
-Note: If you face any issue After driver installation then force reinstall pytorch
-
-```bash
-pip3 install torch torchvision torchaudio --force-reinstall --extra-index-url https://download.pytorch.org/whl/cu116
+pip install torch torchvision torchaudio --force-reinstall --extra-index-url https://download.pytorch.org/whl/cu116
 ```
 
 ```bash
@@ -89,7 +83,7 @@ export PATH="/home/user/.local/bin:$PATH"
 You will then need to profile, do this by either running the command:
 
 ```bash
-source ~/.bash_profile
+source ~/.bashrc
 ```
 
 ## Labels

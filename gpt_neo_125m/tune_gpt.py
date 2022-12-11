@@ -154,7 +154,7 @@ default_args = {
     
     # Total number of training epochs to perform
     "num_train_epochs": 5,
-    "per_device_train_batch_size": 7,
+    "per_device_train_batch_size": 6,
     
     # Default "adamw_hf" is deprecated
     "optim": "adamw_torch",
@@ -174,14 +174,14 @@ default_args = {
     "dataloader_drop_last": True,
     
     # Number of steps used for a linear warmup from 0 to learning_rate. Overrides any effect of warmup_ratio.
-    "warmup_steps": 100, 
+    "warmup_steps": 500, 
     # The weight decay to apply (if not zero) to all layers except all bias and LayerNorm weights in AdamW optimizer.
-    "weight_decay": 0.01, 
+    "weight_decay": 0.05, 
     # The initial learning rate for AdamW optimizer.
-    "learning_rate": 1e-4,
+    "learning_rate": 5e-5,
     
     # we can reduce the precision the variales and their computations are faster. 
-    "fp16": True,
+    # "fp16": True,
     "deepspeed": args.deepspeed
 }
 training_args = TrainingArguments(**default_args)
