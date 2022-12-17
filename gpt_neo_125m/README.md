@@ -41,7 +41,6 @@ Optional - Remove previously installed nvidia driver
 sudo apt clean
 sudo apt update
 sudo apt purge nvidia-* 
-sudo apt autoremove
 ```
 
 nvidia driver version 510 & CUDA 11.6 - [download](https://developer.nvidia.com/cuda-downloads?target_os=Linux&target_arch=x86_64&Distribution=Ubuntu&target_version=20.04&target_type=deb_network)
