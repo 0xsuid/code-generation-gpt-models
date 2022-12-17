@@ -28,3 +28,6 @@ python3 -m pip install torch torchvision torchaudio --force-reinstall --extra-in
 # Install Deepspeed
 sudo apt install -y libaio-dev
 python3 -m pip install deepspeed
+
+# Reboot server - to update nvidia driver
+sudo reboot now
