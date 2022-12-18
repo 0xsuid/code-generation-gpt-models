@@ -22,7 +22,7 @@ source ~/.bashrc
 
 # Install Python dependencies
 sudo apt-get install -y python3-pip
-python3 -m pip install pandas transformers datasets accelerate nvidia-ml-py3 python-dotenv requests
+python3 -m pip install pandas transformers tensorboard datasets accelerate nvidia-ml-py3 python-dotenv requests
 python3 -m pip install torch torchvision torchaudio --force-reinstall --extra-index-url https://download.pytorch.org/whl/cu116
 
 # Install Deepspeed

@@ -32,6 +32,12 @@
         "contiguous_gradients": true
     },
 
+    "tensorboard": {
+        "enabled": true,
+        "output_path": "logs/",
+        "job_name": "train_neo"
+    },
+
     "zero_allow_untested_optimizer": true,
     "gradient_accumulation_steps": "auto",
     "gradient_clipping": "auto",
