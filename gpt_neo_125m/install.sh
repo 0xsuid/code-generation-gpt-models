@@ -26,7 +26,7 @@ python3 -m pip install pandas transformers tensorboard datasets accelerate nvidi
 python3 -m pip install torch torchvision torchaudio --force-reinstall --extra-index-url https://download.pytorch.org/whl/cu116
 
 # Install Deepspeed
-sudo apt install -y libaio-dev
+sudo apt install -y libaio-dev ninja-build
 python3 -m pip install deepspeed
 
 # Reboot server - to update nvidia driver
