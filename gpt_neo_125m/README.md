@@ -13,7 +13,7 @@ nohup python3 -u tune_gpt.py --limit 10 > output.log 2>&1 &
 ```
 
 ```bash
-nohup deepspeed --num_gpus=1 tune_gpt.py  --deepspeed deepspeed.json --upload-model > output.log 2>&1 &
+nohup deepspeed --num_gpus=4 tune_gpt.py --deepspeed deepspeed.json > output.log 2>&1 &
 ```
 
 ## Supported Arguments
@@ -91,6 +91,12 @@ we pass the input data as the label instead of just the answer labels. This is b
 
 - https://huggingface.co/docs/transformers/v4.23.1/en/glossary#labels
 - https://huggingface.co/transformers/v4.8.2/model_doc/gpt_neo.html#transformers.GPTNeoForCausalLM.forward
+
+## Cuda out of memory
+
+When first gpu run out of memory but we have more memory available on other gpus then setting "max_split_size_mb" might be useful
+
+- https://stackoverflow.com/questions/73747731/runtimeerror-cuda-out-of-memory-how-setting-max-split-size-mb
 
 ## References
 
