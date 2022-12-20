@@ -53,13 +53,15 @@ parser.add_argument("-upload", "--upload-model", dest="upload_model", action="st
                     help="Upload fine-tuned model to Huggingface")
 parser.add_argument("-stop", "--stop-instance", dest="stop_instance", action="store_true",
                     help="Stop tensordock instance after training")
-parser.add_argument("-lr", "--local_rank", dest="local_rank",
+parser.add_argument("-lr", "--local_rank", dest="local_rank", default=-1, type=int,
                     help="local rank")
 parser.add_argument("-ds", "--deepspeed", dest="deepspeed", default=None, type=str,
                     help="deepspeed config")
 parser.add_argument("-v", "--verbosity", dest="verbosity", default="info", 
                     choices=["info","error"],
                     help="Verbosity", metavar="V")
+# Include DeepSpeed configuration arguments
+# parser = deepspeed.add_config_arguments(parser)
 args = parser.parse_args()
 
 # load environment variables from .env
@@ -70,11 +72,9 @@ td_server_id = os.getenv("TD_SERVER_ID")
 huggingface_token = os.getenv("HF_TOKEN")
 huggingface_repo_id = os.getenv("HF_REPO_ID")
 
-tokenizer = AutoTokenizer.from_pretrained("EleutherAI/gpt-neo-125M", 
-                                            bos_token='<|startoftext|>',
-                                            eos_token='<|endoftext|>', 
-                                            pad_token='<|pad|>')
+tokenizer = AutoTokenizer.from_pretrained("EleutherAI/gpt-neo-125M")
 model = AutoModelForCausalLM.from_pretrained("EleutherAI/gpt-neo-125M").cuda()
+tokenizer.pad_token = tokenizer.eos_token
 model.resize_token_embeddings(len(tokenizer))
 
 raw_ds = load_dataset("codeparrot/apps", split="train")
@@ -112,18 +112,18 @@ class AppsDataset(Dataset):
     def __getitem__(self, idx):
         # truncation is required to avoid following issue
         # https://github.com/huggingface/transformers/issues/1791
-        encodings_dict = tokenizer('<|startoftext|>' + self.coding_problems[idx] + '<|endoftext|>', 
+        encodings_dict = tokenizer(self.coding_problems[idx], 
                                     truncation=True,
                                     max_length=max_length, 
                                     padding="max_length")
         return {
             "input_ids" : torch.tensor(encodings_dict['input_ids']),
-            "attention_mask": torch.tensor(encodings_dict['attention_mask']),
+            # "attention_mask": torch.tensor(encodings_dict['attention_mask']),
             "labels" :  torch.tensor(encodings_dict['input_ids'])
         }
 
 
-train_dataset = AppsDataset(coding_problems, tokenizer, max_length=max_length)
+train_dataset = AppsDataset(coding_problems, tokenizer, max_length)
 save_dir = './results'
 
 # Logging - https://huggingface.co/docs/transformers/main_classes/logging
@@ -179,6 +179,7 @@ default_args = {
     "weight_decay": 0.05, 
     # The initial learning rate for AdamW optimizer.
     "learning_rate": 5e-5,
+    "local_rank": args.local_rank,
     
     # we can reduce the precision the variales and their computations are faster. 
     # "fp16": True,
@@ -216,13 +217,16 @@ with open(os.path.join(final_save_dir, 'configs.json'), 'w') as f:
 
 pwd_path = os.path.dirname(os.path.realpath(__file__))
 
+model.save_pretrained(os.path.join(final_save_dir, "final_checkpoint"))
+
 # Move python stdout log "output.log" to final_save_dir
-shutil.move(os.path.join(pwd_path, "output.log"), os.path.join(final_save_dir))
+# shutil.move(os.path.join(pwd_path, "output.log"), os.path.join(final_save_dir))
+
+# Copy deepspeed conf
+shutil.copy(os.path.join(pwd_path, "deepspeed.json"), os.path.join(final_save_dir))
 
 # Move Tensor logs to final_save_dir
-shutil.move(os.path.join(pwd_path, "logs"), os.path.join(final_save_dir))
-
-model.save_pretrained(os.path.join(final_save_dir, "final_checkpoint"))
+# shutil.move(os.path.join(pwd_path, "logs"), os.path.join(final_save_dir))
 
 if(args.upload_model 
    and huggingface_token
