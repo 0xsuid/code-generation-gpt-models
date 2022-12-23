@@ -3,12 +3,10 @@ import torch
 import psutil
 import shutil
 import requests
-import pandas as pd
 from pynvml import *
 from os import makedirs
 from datetime import date
 from hashlib import sha256
-# from urllib import parse
 from dotenv import load_dotenv
 from datasets import load_dataset
 from huggingface_hub import HfApi
@@ -93,18 +91,6 @@ print("Max length: {}".format(max_length))
 class AppsDataset(Dataset):
     def __init__(self, txt_list, tokenizer, max_length):
         self.coding_problems = txt_list
-        self.input_ids = []
-        self.attn_masks = []
-        self.labels = []
-        # for txt in txt_list:
-        #     # truncation is required to avoid following issue
-        #     # https://github.com/huggingface/transformers/issues/1791
-        #     encodings_dict = tokenizer('<|startoftext|>' + txt + '<|endoftext|>', 
-        #                                 truncation=True,
-        #                                 max_length=max_length, 
-        #                                 padding="max_length")
-        #     self.input_ids.append(torch.tensor(encodings_dict['input_ids']))
-        #     self.attn_masks.append(torch.tensor(encodings_dict['attention_mask']))
 
     def __len__(self):
         return len(self.coding_problems)
@@ -220,13 +206,13 @@ pwd_path = os.path.dirname(os.path.realpath(__file__))
 model.save_pretrained(os.path.join(final_save_dir, "final_checkpoint"))
 
 # Move python stdout log "output.log" to final_save_dir
-# shutil.move(os.path.join(pwd_path, "output.log"), os.path.join(final_save_dir))
+shutil.move(os.path.join(pwd_path, "output.log"), os.path.join(final_save_dir))
 
 # Copy deepspeed conf
 shutil.copy(os.path.join(pwd_path, "deepspeed.json"), os.path.join(final_save_dir))
 
 # Move Tensor logs to final_save_dir
-# shutil.move(os.path.join(pwd_path, "logs"), os.path.join(final_save_dir))
+shutil.move(os.path.join(pwd_path, "logs"), os.path.join(final_save_dir))
 
 if(args.upload_model 
    and huggingface_token
