@@ -203,7 +203,9 @@ with open(os.path.join(final_save_dir, 'configs.json'), 'w') as f:
 
 pwd_path = os.path.dirname(os.path.realpath(__file__))
 
-model.save_pretrained(os.path.join(final_save_dir, "final_checkpoint"))
+model_save_dir = os.path.join(final_save_dir, "final_checkpoint")
+model.save_pretrained(model_save_dir)
+tokenizer.save_pretrained(model_save_dir)
 
 # Move python stdout log "output.log" to final_save_dir
 shutil.move(os.path.join(pwd_path, "output.log"), os.path.join(final_save_dir))
