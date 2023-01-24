@@ -22,12 +22,12 @@ source ~/.bashrc
 
 # Install Python dependencies
 sudo apt-get install -y python3-pip
-python3 -m pip install pandas transformers tensorboard datasets accelerate nvidia-ml-py3 python-dotenv requests
+python3 -m pip install pandas transformers tensorboard datasets accelerate nvidia-ml-py3 python-dotenv requests huggingface_hub
 python3 -m pip install torch torchvision torchaudio --force-reinstall --extra-index-url https://download.pytorch.org/whl/cu116
 
 # Install Deepspeed
 sudo apt install -y libaio-dev ninja-build
-python3 -m pip install deepspeed
+DS_BUILD_OPS=1 python3 -m pip install deepspeed
 
 # Reboot server - to update nvidia driver
 sudo reboot now
