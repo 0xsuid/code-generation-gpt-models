@@ -13,7 +13,7 @@ nohup python3 -u tune_gpt.py --limit 10 > output.log 2>&1 &
 ```
 
 ```bash
-nohup deepspeed --num_gpus=4 tune_gpt.py --deepspeed deepspeed.json > output.log 2>&1 &
+nohup deepspeed tune_gpt.py --deepspeed deepspeed.json > output.log 2>&1 &
 ```
 
 ## Supported Arguments
