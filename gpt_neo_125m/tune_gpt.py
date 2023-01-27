@@ -120,8 +120,7 @@ elif(args.verbosity == "error"):
     logging.set_verbosity_error()
 
 default_args = {
-    "output_dir": save_dir, 
-    # overwrite_output_dir: False,
+    "output_dir": save_dir,
     
     # Disable Evaluation
     "evaluation_strategy": 'no',
@@ -135,7 +134,7 @@ default_args = {
     "logging_dir": './logs',
     
     # Save
-    "save_steps": 2,
+    "save_steps": 50,
     "save_total_limit": 1,
     
     # Total number of training epochs to perform
@@ -168,11 +167,11 @@ default_args = {
     "weight_decay": 0.05, 
     # The initial learning rate for AdamW optimizer.
     "learning_rate": 5e-5,
-    "local_rank": args.local_rank,
     
     # we can reduce the precision the variales and their computations are faster. 
     # "fp16": True,
-    "deepspeed": args.deepspeed
+    "deepspeed": args.deepspeed,
+    "local_rank": args.local_rank,
 }
 
 if(args.upload_model
@@ -228,10 +227,10 @@ if args.local_rank == 0:
     # Move python stdout log "output.log" to final_save_dir
     shutil.move(os.path.join(pwd_path, "output.log"), os.path.join(final_save_dir))
 
-    # # Copy deepspeed conf
+    # Copy deepspeed conf
     shutil.copy(os.path.join(pwd_path, "deepspeed.json"), os.path.join(final_save_dir))
 
-    # # Move Tensor logs to final_save_dir
+    # Move Tensor logs to final_save_dir
     shutil.move(os.path.join(pwd_path, "logs"), os.path.join(final_save_dir))
 
     if(args.upload_experiment
