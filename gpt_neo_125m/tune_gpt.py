@@ -70,8 +70,9 @@ td_server_id = os.getenv("TD_SERVER_ID")
 huggingface_token = os.getenv("HF_TOKEN")
 huggingface_repo_id = os.getenv("HF_REPO_ID")
 
-tokenizer = AutoTokenizer.from_pretrained("EleutherAI/gpt-neo-125M")
-model = AutoModelForCausalLM.from_pretrained("EleutherAI/gpt-neo-125M").cuda()
+tokenizer = AutoTokenizer.from_pretrained("EleutherAI/gpt-neo-1.3B")
+# 
+model = AutoModelForCausalLM.from_pretrained("EleutherAI/gpt-neo-1.3B", use_cache=False).cuda()
 tokenizer.pad_token = tokenizer.eos_token
 model.resize_token_embeddings(len(tokenizer))
 
@@ -118,6 +119,7 @@ if(args.verbosity == "info"):
 elif(args.verbosity == "error"):
     logging.set_verbosity_error()
 
+logging.set_verbosity_info()
 
 default_args = {
     "output_dir": save_dir, 
@@ -135,12 +137,12 @@ default_args = {
     "logging_dir": './logs',
     
     # Save
-    "save_steps": 200,
-    "save_total_limit": 2,
+    "save_steps": 50,
+    "save_total_limit": 1,
     
     # Total number of training epochs to perform
     "num_train_epochs": 5,
-    "per_device_train_batch_size": 6,
+    "per_device_train_batch_size": 16,
     
     # Default "adamw_hf" is deprecated
     "optim": "adamw_torch",
@@ -149,12 +151,15 @@ default_args = {
     # The way we do that is to calculate the gradients iteratively in smaller batches by doing a forward and backward pass through the model and accumulating the gradients in the process. 
     # When enough gradients are accumulated we run the model’s optimization step. This way we can easily increase the overall batch size to numbers that would never fit into the GPU’s memory. 
     # In turn, however, the added forward and backward passes can slow down the training a bit.
-    # "gradient_accumulation_steps": 4,
+    "gradient_accumulation_steps": 8,
     
     # In order to compute the gradients during the backward pass all activations from the forward pass are normally saved. 
     # This can create a big memory overhead. Alternatively, one could forget all activations during the forward pass and recompute them on demand during the backward pass. 
     # This would however add a significant computational overhead and slow down training.
-    # "gradient_checkpointing":True,
+    "gradient_checkpointing":True,
+    "hub_model_id": huggingface_repo_id,
+    "hub_token": huggingface_token,
+    "hub_strategy": "checkpoint",
     
     # Drop the last incomplete batch if it is not divisible by the batch size
     "dataloader_drop_last": True,
@@ -190,45 +195,51 @@ other_info= {
     "dataset_limit": args.limit,
 }
 
-all_configs = {**default_args,**device_info,**other_info}
-configs_json = json.dumps(all_configs,sort_keys=True).encode('utf8')
-calulated_hash = sha256(configs_json).hexdigest()
-today = str(date.today())
-final_save_dir = os.path.join("experiments", today+"-"+calulated_hash)
+if args.local_rank == 0:
+    if 'hub_token' in my_dict: del my_dict['hub_token']
+    if 'hub_model_id' in my_dict: del my_dict['hub_model_id']
 
-os.makedirs(final_save_dir,exist_ok=True)
+    all_configs = {**default_args,**device_info,**other_info}
+    configs_json = json.dumps(all_configs,sort_keys=True).encode('utf8')
+    calulated_hash = sha256(configs_json).hexdigest()
+    today = str(date.today())
+    final_save_dir = os.path.join("experiments", today+"-"+calulated_hash)
+    os.makedirs(final_save_dir,exist_ok=True)
 
-with open(os.path.join(final_save_dir, 'configs.json'), 'w') as f:
-    json.dump(all_configs, f, indent=4, ensure_ascii=False)
+    with open(os.path.join(final_save_dir, 'configs.json'), 'w') as f:
+        json.dump(all_configs, f, indent=4, ensure_ascii=False)
 
-pwd_path = os.path.dirname(os.path.realpath(__file__))
+    pwd_path = os.path.dirname(os.path.realpath(__file__))
 
-model_save_dir = os.path.join(final_save_dir, "final_checkpoint")
-model.save_pretrained(model_save_dir)
-tokenizer.save_pretrained(model_save_dir)
+    model_save_dir = os.path.join(final_save_dir, "final_checkpoint")
+    model.save_pretrained(model_save_dir)
+    tokenizer.save_pretrained(model_save_dir)
+    
+    trainer_save_dir = os.path.join(final_save_dir, "trainer_final_checkpoint")
+    trainer.save_model(trainer_save_dir)
+    trainer.save_state(trainer_save_dir)
 
-# Move python stdout log "output.log" to final_save_dir
-shutil.move(os.path.join(pwd_path, "output.log"), os.path.join(final_save_dir))
+    # Move python stdout log "output.log" to final_save_dir
+    shutil.move(os.path.join(pwd_path, "output.log"), os.path.join(final_save_dir))
 
-# Copy deepspeed conf
-shutil.copy(os.path.join(pwd_path, "deepspeed.json"), os.path.join(final_save_dir))
+    # # Copy deepspeed conf
+    shutil.copy(os.path.join(pwd_path, "deepspeed.json"), os.path.join(final_save_dir))
 
-# Move Tensor logs to final_save_dir
-shutil.move(os.path.join(pwd_path, "logs"), os.path.join(final_save_dir))
+    # # Move Tensor logs to final_save_dir
+    shutil.move(os.path.join(pwd_path, "logs"), os.path.join(final_save_dir))
 
-if(args.upload_model 
-   and huggingface_token
-   and huggingface_repo_id):
-    api = HfApi()
-    api.upload_folder(
-        folder_path=final_save_dir,
-        path_in_repo=final_save_dir,
-        repo_id=huggingface_repo_id,
-        token=huggingface_token,
-        # ignore_patterns="",
-    )
+    if(args.upload_model 
+    and huggingface_token
+    and huggingface_repo_id):
+        api = HfApi()
+        api.upload_folder(
+            folder_path=final_save_dir,
+            path_in_repo=final_save_dir,
+            repo_id=huggingface_repo_id,
+            token=huggingface_token,
+            # ignore_patterns="",
+        )
 
-
-if(args.stop_instance):
-    if(td_api_key and td_api_token and td_server_id):
-        stop_tensordock_instance(td_api_key, td_api_token, td_server_id)
+    if(args.stop_instance):
+        if(td_api_key and td_api_token and td_server_id):
+            stop_tensordock_instance(td_api_key, td_api_token, td_server_id)
