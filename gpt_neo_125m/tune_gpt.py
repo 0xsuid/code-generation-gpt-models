@@ -13,8 +13,6 @@ from huggingface_hub import HfApi
 from argparse import ArgumentParser
 from torch.utils.data import Dataset, random_split
 from transformers import AutoTokenizer, TrainingArguments, Trainer, AutoModelForCausalLM, logging
-# import deepspeed
-# deepspeed.ops.adam.cpu_adam.CPUAdamBuilder().load()
 
 def print_gpu_utilization():
     nvmlInit()
@@ -119,8 +117,6 @@ if(args.verbosity == "info"):
 elif(args.verbosity == "error"):
     logging.set_verbosity_error()
 
-logging.set_verbosity_info()
-
 default_args = {
     "output_dir": save_dir, 
     # overwrite_output_dir: False,
@@ -196,8 +192,8 @@ other_info= {
 }
 
 if args.local_rank == 0:
-    if 'hub_token' in my_dict: del my_dict['hub_token']
-    if 'hub_model_id' in my_dict: del my_dict['hub_model_id']
+    if 'hub_token' in default_args: del default_args['hub_token']
+    if 'hub_model_id' in default_args: del default_args['hub_model_id']
 
     all_configs = {**default_args,**device_info,**other_info}
     configs_json = json.dumps(all_configs,sort_keys=True).encode('utf8')

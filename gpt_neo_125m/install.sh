@@ -30,7 +30,7 @@ sudo apt install -y libaio-dev ninja-build
 python3 -m pip install deepspeed
 
 # Install Git LFS
-sudo apt install git git-lfs
+sudo apt install git git-lfs -y
 git lfs install
 
 # Reboot server - to update nvidia driver
