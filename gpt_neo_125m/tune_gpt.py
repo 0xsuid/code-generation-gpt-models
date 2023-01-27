@@ -47,6 +47,8 @@ parser.add_argument("-l", "--limit", dest="limit", default=0, type=int,
                     help="Limit Total no. of problems", metavar="N")
 parser.add_argument("-upload", "--upload-model", dest="upload_model", action="store_true",
                     help="Upload fine-tuned model to Huggingface")
+parser.add_argument("-upload-experiment", "--upload-experiment", dest="upload_experiment", action="store_true",
+                    help="Upload fine-tuned model to Huggingface in experiemnt dir")
 parser.add_argument("-stop", "--stop-instance", dest="stop_instance", action="store_true",
                     help="Stop tensordock instance after training")
 parser.add_argument("-lr", "--local_rank", dest="local_rank", default=-1, type=int,
@@ -133,7 +135,7 @@ default_args = {
     "logging_dir": './logs',
     
     # Save
-    "save_steps": 50,
+    "save_steps": 2,
     "save_total_limit": 1,
     
     # Total number of training epochs to perform
@@ -153,9 +155,9 @@ default_args = {
     # This can create a big memory overhead. Alternatively, one could forget all activations during the forward pass and recompute them on demand during the backward pass. 
     # This would however add a significant computational overhead and slow down training.
     "gradient_checkpointing":True,
-    "hub_model_id": huggingface_repo_id,
-    "hub_token": huggingface_token,
-    "hub_strategy": "checkpoint",
+    # "hub_model_id": huggingface_repo_id,
+    # "hub_token": huggingface_token,
+    # "hub_strategy": "checkpoint",
     
     # Drop the last incomplete batch if it is not divisible by the batch size
     "dataloader_drop_last": True,
@@ -172,6 +174,14 @@ default_args = {
     # "fp16": True,
     "deepspeed": args.deepspeed
 }
+
+if(args.upload_model
+and huggingface_token
+and huggingface_repo_id):
+    default_args['hub_model_id'] = huggingface_repo_id
+    default_args['hub_token'] = huggingface_token
+    default_args['hub_strategy'] = "checkpoint"
+
 training_args = TrainingArguments(**default_args)
 trainer = Trainer(model=model, 
         args=training_args, 
@@ -224,7 +234,7 @@ if args.local_rank == 0:
     # # Move Tensor logs to final_save_dir
     shutil.move(os.path.join(pwd_path, "logs"), os.path.join(final_save_dir))
 
-    if(args.upload_model 
+    if(args.upload_experiment
     and huggingface_token
     and huggingface_repo_id):
         api = HfApi()
