@@ -185,6 +185,7 @@ training_args = TrainingArguments(**default_args)
 trainer = Trainer(model=model, 
         args=training_args, 
         train_dataset=train_dataset,
+        tokenizer=tokenizer
         )
 
 print_gpu_utilization()
@@ -217,8 +218,9 @@ if args.local_rank == 0:
     pwd_path = os.path.dirname(os.path.realpath(__file__))
 
     model_save_dir = os.path.join(final_save_dir, "final_checkpoint")
+    tokenizer_save_dir = os.path.join(model_save_dir, "tokenizer")
     model.save_pretrained(model_save_dir)
-    tokenizer.save_pretrained(model_save_dir)
+    tokenizer.save_pretrained(tokenizer_save_dir)
     
     trainer_save_dir = os.path.join(final_save_dir, "trainer_final_checkpoint")
     trainer.save_model(trainer_save_dir)
