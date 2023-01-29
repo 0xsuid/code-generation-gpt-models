@@ -128,13 +128,13 @@ default_args = {
     "eval_steps": 0, 
     
     # Logging
-    "log_level": "error",
+    "log_level": "info",
     "logging_first_step": True,
     "logging_steps": 5,
     "logging_dir": './logs',
     
     # Save
-    "save_steps": 50,
+    "save_steps": 15,
     "save_total_limit": 1,
     
     # Total number of training epochs to perform
@@ -154,9 +154,6 @@ default_args = {
     # This can create a big memory overhead. Alternatively, one could forget all activations during the forward pass and recompute them on demand during the backward pass. 
     # This would however add a significant computational overhead and slow down training.
     "gradient_checkpointing":True,
-    # "hub_model_id": huggingface_repo_id,
-    # "hub_token": huggingface_token,
-    # "hub_strategy": "checkpoint",
     
     # Drop the last incomplete batch if it is not divisible by the batch size
     "dataloader_drop_last": True,
@@ -180,6 +177,9 @@ and huggingface_repo_id):
     default_args['hub_model_id'] = huggingface_repo_id
     default_args['hub_token'] = huggingface_token
     default_args['hub_strategy'] = "checkpoint"
+    default_args['push_to_hub'] = True
+    if args.local_rank == 0:
+        print("Model will be uploaded to hub")
 
 training_args = TrainingArguments(**default_args)
 trainer = Trainer(model=model, 
