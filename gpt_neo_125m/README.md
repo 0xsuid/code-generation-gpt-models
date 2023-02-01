@@ -98,6 +98,11 @@ When first gpu run out of memory but we have more memory available on other gpus
 
 - https://stackoverflow.com/questions/73747731/runtimeerror-cuda-out-of-memory-how-setting-max-split-size-mb
 
+# Decoding Strategies
+
+- https://huggingface.co/docs/transformers/main/en/generation_strategies#decoding-strategies
+
 ## References
 
 - https://huggingface.co/docs/transformers/perf_train_gpu_one
+- https://huggingface.co/docs/transformers/main/en/generation_strategies#decoding-strategies
