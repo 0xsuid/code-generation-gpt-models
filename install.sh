@@ -21,6 +21,9 @@ sudo apt install -y nvidia-driver-510 cuda-toolkit-11-6
 sudo apt install git git-lfs -y
 git lfs install
 
+# For Deepspeed
+sudo apt install -y libaio-dev ninja-build
+
 # Update bashrc - For Ubuntu20.0
 # To resolve -> WARNING: The script datasets-cli is installed in '/home/user/.local/bin' which is not on PATH.
 echo 'export PATH="/home/user/.local/bin:$PATH"' >> ~/.bashrc 
@@ -36,7 +39,6 @@ elif [ "$INSTALLATION_TYPE" == "latest" ]; then
     python3 -m pip install torch --force-reinstall --extra-index-url https://download.pytorch.org/whl/cu116
 
     # Install Deepspeed
-    sudo apt install -y libaio-dev ninja-build
     python3 -m pip install deepspeed
 fi
 
