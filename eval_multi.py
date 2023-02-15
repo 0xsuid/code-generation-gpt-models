@@ -4,8 +4,8 @@ import torch
 from datasets import load_dataset
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-tokenizer = transformers.GPT2Tokenizer.from_pretrained("EleutherAI/gpt-neo-125M")
-model = transformers.GPTNeoForCausalLM.from_pretrained("./experiments/neo-1_3b/experiments/2023-02-01-19cc6c3b87bd0a2fac9f1491ad836e1a7f445c9313854786ed97e8faa032593c/final_checkpoint")
+tokenizer = transformers.AutoTokenizer.from_pretrained("0xsuid/simba-1.3b")
+model = transformers.AutoModelForCausalLM.from_pretrained("0xsuid/simba-1.3b")
 model.resize_token_embeddings(len(tokenizer))
 model.to(device)
 
@@ -22,7 +22,7 @@ coding_problems = format_input(raw_ds)
 generated_codes = {}
 
 for idx, coding_problem in enumerate(coding_problems):
-    encoded_tokens = tokenizer.encode(coding_problems)
+    encoded_tokens = tokenizer.encode(coding_problem)
     input_ids = torch.LongTensor(encoded_tokens).unsqueeze(0).to(device)
 
     output_ids = model.generate(
@@ -31,8 +31,8 @@ for idx, coding_problem in enumerate(coding_problems):
         early_stopping=True,
         penalty_alpha=0.6, 
         top_k=4, 
-        # max_new_tokens=120,
-        max_length=2048 - len(input_ids)
+        max_new_tokens=2048 - len(input_ids[0]),
+        # max_length=2048 - len(input_ids[0])
     )
 
     generated_codes[idx] = tokenizer.decode(output_ids[0], skip_special_tokens=True).split("ANSWER:\n")[1]
