@@ -29,9 +29,9 @@ source ~/.bashrc
 # Install Python dependencies
 sudo apt-get install -y python3-pip
 
-if [ "$INSTALLATION_TYPE" -eq "stable" ]; then
+if [ "$INSTALLATION_TYPE" == "stable" ]; then
     python3 -m pip install -r requirements.txt
-elif [ "$INSTALLATION_TYPE" -eq "latest" ]; then
+elif [ "$INSTALLATION_TYPE" == "latest" ]; then
     python3 -m pip install transformers tensorboard datasets nvidia-ml-py3 python-dotenv requests huggingface_hub
     python3 -m pip install torch --force-reinstall --extra-index-url https://download.pytorch.org/whl/cu116
 
