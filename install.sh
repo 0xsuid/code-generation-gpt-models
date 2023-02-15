@@ -1,5 +1,7 @@
 #!/bin/bash
 
+INSTALLATION_TYPE=${1:-stable}
+
 export DEBIAN_FRONTEND=noninteractive
 sudo apt update -y
 sudo apt upgrade -y
@@ -15,6 +17,10 @@ sudo dpkg -i /tmp/cuda-keyring_1.0-1_all.deb
 sudo apt-get update -y
 sudo apt install -y nvidia-driver-510 cuda-toolkit-11-6
 
+# Install Git LFS - To upload large files on HuggingFace
+sudo apt install git git-lfs -y
+git lfs install
+
 # Update bashrc - For Ubuntu20.0
 # To resolve -> WARNING: The script datasets-cli is installed in '/home/user/.local/bin' which is not on PATH.
 echo 'export PATH="/home/user/.local/bin:$PATH"' >> ~/.bashrc 
@@ -22,16 +28,17 @@ source ~/.bashrc
 
 # Install Python dependencies
 sudo apt-get install -y python3-pip
-python3 -m pip install pandas transformers tensorboard datasets accelerate nvidia-ml-py3 python-dotenv requests huggingface_hub
-python3 -m pip install torch torchvision torchaudio --force-reinstall --extra-index-url https://download.pytorch.org/whl/cu116
 
-# Install Deepspeed
-sudo apt install -y libaio-dev ninja-build
-python3 -m pip install deepspeed
+if [ "$INSTALLATION_TYPE" -eq "stable" ]; then
+    python3 -m pip install -r requirements.txt
+elif [ "$INSTALLATION_TYPE" -eq "latest" ]; then
+    python3 -m pip install transformers tensorboard datasets nvidia-ml-py3 python-dotenv requests huggingface_hub
+    python3 -m pip install torch --force-reinstall --extra-index-url https://download.pytorch.org/whl/cu116
 
-# Install Git LFS
-sudo apt install git git-lfs -y
-git lfs install
+    # Install Deepspeed
+    sudo apt install -y libaio-dev ninja-build
+    python3 -m pip install deepspeed
+fi
 
 # Reboot server - to update nvidia driver
 sudo reboot now
