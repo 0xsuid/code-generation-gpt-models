@@ -10,7 +10,7 @@ from datasets import load_dataset
 parser = ArgumentParser()
 parser.add_argument("-l", "--limit", dest="limit", default=0, type=int,
                     help="Limit Total no. of problems")
-parser.add_argument("-d", "--difficulties", dest="difficulties", choices=["all","introductory","interview ","competition"],
+parser.add_argument("-d", "--difficulties", dest="difficulties", choices=["all","introductory","interview","competition"],
                     default="all", help="difficulties - introductory, interview & competition")
 args = parser.parse_args()
 
