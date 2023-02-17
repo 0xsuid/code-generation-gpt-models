@@ -70,9 +70,15 @@ for idx, coding_problem in enumerate(coding_problems):
     start = time.time()
     encoded_tokens = tokenizer.encode(coding_problem["question"])
     input_ids = torch.LongTensor(encoded_tokens).unsqueeze(0).to(device)
+    print("Input problem token length: ",len(input_ids[0]))
     
-    if(len(input_ids[0]) > 2048):
-        print("Token indices sequence length excceed than 2048: ",len(input_ids[0]))
+    if(len(input_ids[0]) > 1024):
+        print("Token indices sequence length excceed than 1024: ",len(input_ids[0]))
+        continue
+    
+    if not coding_problem["input_output"]:
+        print("No test case available")
+        continue
 
     try:
         output_ids = model.generate(
@@ -81,8 +87,9 @@ for idx, coding_problem in enumerate(coding_problems):
             early_stopping=True,
             penalty_alpha=0.6, 
             top_k=4, 
+            max_new_tokens=1024,
             # max_new_tokens=2048 - len(input_ids[0]),
-            max_length=2048
+            # max_length=2048
         )
         generated_code = tokenizer.decode(output_ids[0], skip_special_tokens=True).split("ANSWER:\n")[1]
         generated_codes[idx] = {"problem_id": coding_problem["problem_id"], "answer": generated_code, "input_output": coding_problem["input_output"]}
