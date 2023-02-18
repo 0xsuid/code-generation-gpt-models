@@ -1,0 +1,9 @@
+penalty_alpha=0.5, 
+top_k=6, 
+max_new_tokens=1024,
+
+number of compile errors = 46 avg = 0.046
+number of runtime errors = 461 avg = 0.461
+number of problems evaluated = 1000
+Average Accuracy : 0.07518197861827783
+Strict Accuracy : 0.016

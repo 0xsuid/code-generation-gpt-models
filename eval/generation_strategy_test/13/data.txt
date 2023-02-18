@@ -1,0 +1,20 @@
+penalty_alpha=0.5, 
+top_k=6, 
+max_new_tokens=1024,
+
+unable to get function error = (<class 'AttributeError'>, AttributeError("module 'tmp_sol' has no attribute 'largestSumAfterKNegations'"), <traceback object at 0x7fe596cc3440>)
+unable to get function error = (<class 'AttributeError'>, AttributeError("module 'tmp_sol' has no attribute 'canThreePartsEqualSum'"), <traceback object at 0x7fe5864eadc0>)
+unable to get function error = (<class 'AttributeError'>, AttributeError("module 'tmp_sol' has no attribute 'findContentChildren'"), <traceback object at 0x7fe5864fbcc0>)
+unable to get function error = (<class 'AttributeError'>, AttributeError("module 'tmp_sol' has no attribute 'getRow'"), <traceback object at 0x7fe5972430c0>)
+unable to get function error = (<class 'AttributeError'>, AttributeError("module 'tmp_sol' has no attribute 'hammingWeight'"), <traceback object at 0x7fe62bb29440>)
+unable to get function error = (<class 'AttributeError'>, AttributeError("module 'tmp_sol' has no attribute 'plusOne'"), <traceback object at 0x7fe596d64c00>)
+unable to get function error = (<class 'AttributeError'>, AttributeError("module 'tmp_sol' has no attribute 'reverseBits'"), <traceback object at 0x7fe586504cc0>)
+unable to get function error = (<class 'AttributeError'>, AttributeError("module 'tmp_sol' has no attribute 'generate'"), <traceback object at 0x7fe586501e40>)
+unable to get function error = (<class 'AttributeError'>, AttributeError("module 'tmp_sol' has no attribute 'hasCycle'"), <traceback object at 0x7fe586506d80>)
+unable to get function error = (<class 'AttributeError'>, AttributeError("module 'tmp_sol' has no attribute 'twoSum'"), <traceback object at 0x7fe586506d80>)
+Computing accuracy metrics...
+number of compile errors = 35 avg = 0.04315659679408138
+number of runtime errors = 98 avg = 0.12083847102342787
+number of problems evaluated = 811
+Average Accuracy : 0.002022730298767533
+Strict Accuracy : 0.0
