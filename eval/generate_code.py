@@ -70,12 +70,15 @@ for idx, coding_problem in enumerate(coding_problems):
         continue
 
     try:
+        # https://arxiv.org/pdf/2202.06417.pdf - pg9
+        # when α ∈ [0.5, 0.8], it yields generation diversity and
+        # perplexity that are both comparable to human performance
         output_ids = model.generate(
             input_ids,
             # num_beams=5,
             # early_stopping=True,
-            penalty_alpha=0.55, 
-            top_k=4, 
+            penalty_alpha=0.5, 
+            top_k=6, 
             max_new_tokens=1024,
             # max_length=2048
         )
