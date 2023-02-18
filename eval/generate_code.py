@@ -41,7 +41,7 @@ def format_input(dataset):
                 formatted_dataset.append({"problem_id": data["problem_id"], "question": str_format, "input_output": data["input_output"]})
         return formatted_dataset
     
-raw_ds = load_dataset("codeparrot/apps", split="train", difficulties=difficulty_level)
+raw_ds = load_dataset("codeparrot/apps", split="test", difficulties=difficulty_level)
 coding_problems = format_input(raw_ds)
 generated_codes = {}
 
@@ -64,8 +64,8 @@ for idx, coding_problem in enumerate(coding_problems):
     
     # Some Questions are too large than 1200 token so it doesn't make sense to trim question
     # and generate answer for that, so we will avoid those question and grab one of those extra problems
-    if(len(input_ids[0]) > 1200):
-        print("Token indices sequence length excceed than 1200: ",len(input_ids[0]))
+    if(len(input_ids[0]) > 1024):
+        print("Token indices sequence length excceed than 1024: ",len(input_ids[0]))
         generated_codes[idx] = {"problem_id": coding_problem["problem_id"], "answer": ""}
         continue
 
