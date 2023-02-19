@@ -22,10 +22,6 @@ parser.add_argument("-m", "--model", dest="model", default="0xsuid/simba-1.3b",
                     help="Model to use for code generation")
 args = parser.parse_args()
 
-difficulty_level = ["introductory","interview","competition"]
-if(args.difficulties != "all"):
-    difficulty_level = [args.difficulties]
-
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 tokenizer = transformers.AutoTokenizer.from_pretrained(args.tokenizer)
 tokenizer.pad_token = tokenizer.eos_token
@@ -40,8 +36,12 @@ def format_input(dataset):
                 str_format = "\nQUESTION:\n" + data['question'] + "\n" + data["starter_code"] + "\n" + answer_type + "\nANSWER:\n"
                 formatted_dataset.append({"problem_id": data["problem_id"], "question": str_format, "input_output": data["input_output"]})
         return formatted_dataset
-    
-raw_ds = load_dataset("codeparrot/apps", split="test", difficulties=difficulty_level)
+
+# No. of problems in each difficulty set
+# introductory - 1000
+# interview - 3000
+# competition - 1000
+raw_ds = load_dataset("codeparrot/apps", split="test", difficulties=args.difficulties)
 coding_problems = format_input(raw_ds)
 generated_codes = {}
 
