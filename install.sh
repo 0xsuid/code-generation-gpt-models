@@ -22,7 +22,7 @@ sudo apt install git git-lfs -y
 git lfs install
 
 # For Deepspeed
-sudo apt install -y libaio-dev ninja-build
+sudo apt install -y libaio-dev ninja-build python3-dev
 
 # Update bashrc - For Ubuntu20.0
 # To resolve -> WARNING: The script datasets-cli is installed in '/home/user/.local/bin' which is not on PATH.
