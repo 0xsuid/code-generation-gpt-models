@@ -10,3 +10,4 @@ torch==1.13.1+cu116
 transformers==4.26.0
 evaluate==0.4.0
 pyext==0.7
+accelerate==0.16.0
