@@ -32,7 +32,7 @@ Fine-Tune the model on apps dataset
 **Note**: argument "-u" is required to disable python output buffering
 
 ```bash
-nohup python3 -u tune_gpt.py --limit 10 > output.log 2>&1 &
+nohup python3 -u tune_gpt.py --limit 10 --local-rank 0 > output.log 2>&1 &
 ```
 
 ### Single GPU/MultiGPU with Deepspeed
@@ -49,7 +49,11 @@ nohup deepspeed tune_gpt.py --deepspeed deepspeed.json > output.log 2>&1 &
     - "--upload-model" - "Upload fine-tuned model to Huggingface"
 3. Stop
     - "--stop-instance" - "Stop tensordock instance after training"
-4. Verbosity
+4. Local Rank
+    - "--local-rank" - "Local rank for deepspeed, it should be 0 when not using deepspeed to save model"
+5. Upload Experiement
+    - "--upload-experiment"" - "Upload Experiment directory to huggingface repo"
+6. Verbosity
     - "--verbosity"
 
 ## Logs Visualization with Tensorboard
