@@ -236,12 +236,14 @@ if args.local_rank == 0:
     # Move Tensor logs to final_save_dir
     shutil.copy(os.path.join(pwd_path, "logs"), os.path.join(final_save_dir))
 
+    experiment_dir = os.path.join(pwd_path, "experiments")
+
     if(args.upload_experiment
     and huggingface_token
     and huggingface_repo_id):
         api = HfApi()
         api.upload_folder(
-            folder_path=final_save_dir,
+            folder_path=experiment_dir,
             path_in_repo="experiments/",
             repo_id=huggingface_repo_id,
             token=huggingface_token,
