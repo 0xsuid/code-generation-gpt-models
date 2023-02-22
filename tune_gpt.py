@@ -55,6 +55,10 @@ parser.add_argument("-lr", "--local_rank", dest="local_rank", default=-1, type=i
                     help="local rank")
 parser.add_argument("-ds", "--deepspeed", dest="deepspeed", default=None, type=str,
                     help="deepspeed config")
+parser.add_argument("-t", "--tokenizer", dest="tokenizer", default="EleutherAI/gpt-neo-125M",
+                    help="Tokenizer to use for code generation")
+parser.add_argument("-m", "--model", dest="model", default="EleutherAI/gpt-neo-125M",
+                    help="Model to use for code generation")
 parser.add_argument("-v", "--verbosity", dest="verbosity", default="info", 
                     choices=["info","error"],
                     help="Verbosity", metavar="V")
@@ -70,9 +74,8 @@ td_server_id = os.getenv("TD_SERVER_ID")
 huggingface_token = os.getenv("HF_TOKEN")
 huggingface_repo_id = os.getenv("HF_REPO_ID")
 
-tokenizer = AutoTokenizer.from_pretrained("EleutherAI/gpt-neo-125M")
-# 
-model = AutoModelForCausalLM.from_pretrained("EleutherAI/gpt-neo-125M").cuda()
+tokenizer = AutoTokenizer.from_pretrained(args.tokenizer)
+model = AutoModelForCausalLM.from_pretrained(args.model).cuda()
 tokenizer.pad_token = tokenizer.eos_token
 model.resize_token_embeddings(len(tokenizer))
 
