@@ -70,9 +70,9 @@ td_server_id = os.getenv("TD_SERVER_ID")
 huggingface_token = os.getenv("HF_TOKEN")
 huggingface_repo_id = os.getenv("HF_REPO_ID")
 
-tokenizer = AutoTokenizer.from_pretrained("EleutherAI/gpt-neo-1.3B")
+tokenizer = AutoTokenizer.from_pretrained("EleutherAI/gpt-neo-125M")
 # 
-model = AutoModelForCausalLM.from_pretrained("EleutherAI/gpt-neo-1.3B", use_cache=False).cuda()
+model = AutoModelForCausalLM.from_pretrained("EleutherAI/gpt-neo-125M").cuda()
 tokenizer.pad_token = tokenizer.eos_token
 model.resize_token_embeddings(len(tokenizer))
 
@@ -134,12 +134,12 @@ default_args = {
     "logging_dir": './logs',
     
     # Save
-    "save_steps": 15,
+    "save_steps": 150,
     "save_total_limit": 1,
     
     # Total number of training epochs to perform
-    "num_train_epochs": 5,
-    "per_device_train_batch_size": 16,
+    "num_train_epochs": 10,
+    "per_device_train_batch_size": 6,
     
     # Default "adamw_hf" is deprecated
     "optim": "adamw_torch",
@@ -148,22 +148,22 @@ default_args = {
     # The way we do that is to calculate the gradients iteratively in smaller batches by doing a forward and backward pass through the model and accumulating the gradients in the process. 
     # When enough gradients are accumulated we run the model’s optimization step. This way we can easily increase the overall batch size to numbers that would never fit into the GPU’s memory. 
     # In turn, however, the added forward and backward passes can slow down the training a bit.
-    "gradient_accumulation_steps": 8,
+    "gradient_accumulation_steps": 4,
     
     # In order to compute the gradients during the backward pass all activations from the forward pass are normally saved. 
     # This can create a big memory overhead. Alternatively, one could forget all activations during the forward pass and recompute them on demand during the backward pass. 
     # This would however add a significant computational overhead and slow down training.
-    "gradient_checkpointing":True,
+    # "gradient_checkpointing":True,
     
     # Drop the last incomplete batch if it is not divisible by the batch size
     "dataloader_drop_last": True,
     
     # Number of steps used for a linear warmup from 0 to learning_rate. Overrides any effect of warmup_ratio.
-    "warmup_steps": 500, 
+    "warmup_steps": 1000, 
     # The weight decay to apply (if not zero) to all layers except all bias and LayerNorm weights in AdamW optimizer.
-    "weight_decay": 0.05, 
+    "weight_decay": 0.1, 
     # The initial learning rate for AdamW optimizer.
-    "learning_rate": 5e-5,
+    "learning_rate": 1e-4,
     
     # we can reduce the precision the variales and their computations are faster. 
     # "fp16": True,
@@ -216,6 +216,7 @@ if args.local_rank == 0:
         json.dump(all_configs, f, indent=4, ensure_ascii=False)
 
     pwd_path = os.path.dirname(os.path.realpath(__file__))
+    print("Current Path: ",pwd_path)
 
     model_save_dir = os.path.join(final_save_dir, "final_checkpoint")
     tokenizer_save_dir = os.path.join(model_save_dir, "tokenizer")
@@ -224,16 +225,16 @@ if args.local_rank == 0:
     
     trainer_save_dir = os.path.join(final_save_dir, "trainer_final_checkpoint")
     trainer.save_model(trainer_save_dir)
-    trainer.save_state(trainer_save_dir)
+    trainer.save_state()
 
     # Move python stdout log "output.log" to final_save_dir
-    shutil.move(os.path.join(pwd_path, "output.log"), os.path.join(final_save_dir))
+    shutil.copy(os.path.join(pwd_path, "output.log"), os.path.join(final_save_dir))
 
     # Copy deepspeed conf
     shutil.copy(os.path.join(pwd_path, "deepspeed.json"), os.path.join(final_save_dir))
 
     # Move Tensor logs to final_save_dir
-    shutil.move(os.path.join(pwd_path, "logs"), os.path.join(final_save_dir))
+    shutil.copy(os.path.join(pwd_path, "logs"), os.path.join(final_save_dir))
 
     if(args.upload_experiment
     and huggingface_token
@@ -241,7 +242,7 @@ if args.local_rank == 0:
         api = HfApi()
         api.upload_folder(
             folder_path=final_save_dir,
-            path_in_repo=final_save_dir,
+            path_in_repo="experiments/",
             repo_id=huggingface_repo_id,
             token=huggingface_token,
             # ignore_patterns="",
