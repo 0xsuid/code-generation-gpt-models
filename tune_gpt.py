@@ -88,6 +88,13 @@ model_max_length = model.config.max_position_embeddings
 max_length = model_max_length
 print("Max length: {}".format(max_length))
 
+num_of_gpus = torch.cuda.device_count()
+# print GPU Names:
+print("GPU Count: ", num_of_gpus)
+print("List of GPUS: ")
+for i in range(num_of_gpus):
+   print(torch.cuda.get_device_properties(i).name)
+
 
 class AppsDataset(Dataset):
     def __init__(self, txt_list, tokenizer, max_length):
