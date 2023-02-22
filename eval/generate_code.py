@@ -14,6 +14,8 @@ parser.add_argument("-d", "--difficulties", dest="difficulties", choices=["all",
                     default="all", help="difficulties - introductory, interview & competition")
 parser.add_argument("-r", "--random", dest="random", action="store_true",
                     help="Randomize problem selection")
+parser.add_argument("-dbg", "--debug", dest="debug", action="store_true",
+                    help="Debug - print Generated Question & Answer")
 parser.add_argument("-s", "--save", dest="save", default="generated_codes.json",
                     help="Save Generated code to file")
 parser.add_argument("-t", "--tokenizer", dest="tokenizer", default="0xsuid/simba-1.3b",
@@ -77,8 +79,8 @@ for idx, coding_problem in enumerate(coding_problems):
             input_ids,
             # num_beams=5,
             # early_stopping=True,
-            penalty_alpha=0.5, 
-            top_k=3, 
+            penalty_alpha=0.7, 
+            top_k=4, 
             max_new_tokens=1024,
             # max_length=2048
         )
@@ -86,6 +88,9 @@ for idx, coding_problem in enumerate(coding_problems):
         generated_codes[idx] = {"problem_id": coding_problem["problem_id"], "answer": generated_code}
         end = time.time()
         print("Time spent to Generate Code:", end - start)
+        if(args.debug):
+            print(coding_problem['question'])
+            print(generated_code)
     except Exception as e:
         print("Failed To generate Code")
         print(e)
