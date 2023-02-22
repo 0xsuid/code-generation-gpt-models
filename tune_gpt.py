@@ -225,7 +225,7 @@ if args.local_rank == 0:
     
     trainer_save_dir = os.path.join(final_save_dir, "trainer_final_checkpoint")
     trainer.save_model(trainer_save_dir)
-    trainer.save_state()
+    # trainer.save_state()
 
     # Move python stdout log "output.log" to final_save_dir
     shutil.copy(os.path.join(pwd_path, "output.log"), os.path.join(final_save_dir))
