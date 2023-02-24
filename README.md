@@ -32,28 +32,32 @@ Fine-Tune the model on apps dataset
 **Note**: argument "-u" is required to disable python output buffering
 
 ```bash
-nohup python3 -u tune_gpt.py --limit 10 --local-rank 0 > output.log 2>&1 &
+nohup python3 -u tune_gpt.py --limit 10 --local-rank 0 --model "EleutherAI/gpt-neo-125M" --tokenizer "EleutherAI/gpt-neo-125M" > output.log 2>&1 &
 ```
 
 ### Single GPU/MultiGPU with Deepspeed
 
 ```bash
-nohup deepspeed tune_gpt.py --deepspeed deepspeed.json > output.log 2>&1 &
+nohup deepspeed tune_gpt.py --deepspeed deepspeed.json --model "EleutherAI/gpt-neo-125M" --tokenizer "EleutherAI/gpt-neo-125M" > output.log 2>&1 &
 ```
 
 ### Supported Arguments
 
 1. Limit
     - "--limit" - "Limit Total no. of problems"
-2. Upload Model
+2. Model
+    - "--model" - "ID of the Model from huggingface - i.e. 'EleutherAI/gpt-neo-125M' "
+3. Tokenizer
+    - "--tokenizer" - "ID of the Tokenizer from huggingface - i.e. 'EleutherAI/gpt-neo-125M' "
+4. Upload Model
     - "--upload-model" - "Upload fine-tuned model to Huggingface"
-3. Stop
+5. Stop
     - "--stop-instance" - "Stop tensordock instance after training"
-4. Local Rank
+6. Local Rank
     - "--local-rank" - "Local rank for deepspeed, it should be 0 when not using deepspeed to save model"
-5. Upload Experiement
+7. Upload Experiement
     - "--upload-experiment"" - "Upload Experiment directory to huggingface repo"
-6. Verbosity
+8. Verbosity
     - "--verbosity"
 
 ## Logs Visualization with Tensorboard
