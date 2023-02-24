@@ -6,16 +6,27 @@ export DEBIAN_FRONTEND=noninteractive
 sudo apt update -y
 sudo apt upgrade -y
 
-# Remove default Nvidia Driver
-sudo apt clean -y
-sudo apt update -y
-sudo apt purge nvidia-* -y
-
 # Install Nvidia driver 510 & Cuda toolkit 11.6
-wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/cuda-keyring_1.0-1_all.deb -P /tmp
-sudo dpkg -i /tmp/cuda-keyring_1.0-1_all.deb
-sudo apt-get update -y
-sudo apt install -y nvidia-driver-510 cuda-toolkit-11-6
+# Install cudakeyring if it is missing
+NVIDIA_KEYRING=$(apt-key list 2> /dev/null | grep cudatools@nvidia.com)
+if [[ ! $NVIDIA_KEYRING ]]; then
+    wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/cuda-keyring_1.0-1_all.deb -P /tmp
+    sudo dpkg -i /tmp/cuda-keyring_1.0-1_all.deb
+    sudo apt-get update -y
+fi
+
+# Check Nvidia driver version for cuda 11.6 compatibility
+# https://docs.nvidia.com/cuda/cuda-toolkit-release-notes/index.html#id3
+NVIDIA_DRIVER_VERSION=$(nvidia-smi --query-gpu=driver_version --format=csv,noheader --id=0)
+NVIDIA_DRIVER_MAJOR_VERSION=${NVIDIA_DRIVER_VERSION%%.*}
+if [[  $NVIDIA_DRIVER_MAJOR_VERSION -gt 450 ]]; then
+    sudo apt install -y cuda-toolkit-11-6
+elif
+    # Remove default Nvidia Driver
+    sudo apt clean -y
+    sudo apt purge nvidia-* -y
+    sudo apt install -y nvidia-driver-510 cuda-toolkit-11-6
+fi
 
 # Install Git LFS - To upload large files on HuggingFace
 sudo apt install git git-lfs -y
