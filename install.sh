@@ -21,7 +21,7 @@ NVIDIA_DRIVER_VERSION=$(nvidia-smi --query-gpu=driver_version --format=csv,nohea
 NVIDIA_DRIVER_MAJOR_VERSION=${NVIDIA_DRIVER_VERSION%%.*}
 if [[  $NVIDIA_DRIVER_MAJOR_VERSION -gt 450 ]]; then
     sudo apt install -y cuda-toolkit-11-6
-elif
+else
     # Remove default Nvidia Driver
     sudo apt clean -y
     sudo apt purge nvidia-* -y
