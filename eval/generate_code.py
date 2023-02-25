@@ -16,6 +16,8 @@ parser.add_argument("-r", "--random", dest="random", action="store_true",
                     help="Randomize problem selection")
 parser.add_argument("-dbg", "--debug", dest="debug", action="store_true",
                     help="Debug - print Generated Question & Answer")
+parser.add_argument("-single", "--single", dest="single", default=None, type=int,
+                    help="generate code for given problem id")
 parser.add_argument("-s", "--save", dest="save", default="generated_codes.json",
                     help="Save Generated code to file")
 parser.add_argument("-t", "--tokenizer", dest="tokenizer", default="0xsuid/simba-1.3b",
@@ -54,6 +56,9 @@ if(args.limit and args.limit>0):
         # Randomly Select given number(limit) of coding_problems
         coding_problems = coding_problems[:args.limit]
 
+if(args.single):
+        coding_problems = [coding_problems[args.single]]
+
 print("Total Coding Problems: ",len(raw_ds))
 
 for idx, coding_problem in enumerate(coding_problems):
@@ -77,12 +82,49 @@ for idx, coding_problem in enumerate(coding_problems):
         # perplexity that are both comparable to human performance
         output_ids = model.generate(
             input_ids,
-            # num_beams=5,
-            # early_stopping=True,
-            penalty_alpha=0.7, 
-            top_k=4, 
+            
+            # beam search
+            num_beams=5,
+            do_sample=True,
+            early_stopping=True,
             max_new_tokens=1024,
-            # max_length=2048
+            # no_repeat_ngram_size=2, 
+            # num_return_sequences=5, 
+            # max_length=2047
+            
+            # sample
+            # do_sample=True, 
+            # max_new_tokens=1024,
+            # top_k=0, 
+            # temperature=0.75,
+            # early_stopping=True,
+            
+            # top-k
+            # do_sample=True, 
+            # early_stopping=True,
+            # max_new_tokens=1024,
+            # top_k=50,
+            
+            # top-p
+            # do_sample=True, 
+            # early_stopping=True,
+            # max_new_tokens=1024,
+            # top_p=0.8, 
+            # top_k=0
+            
+            # top-p+top-k
+            # do_sample=True, 
+            # early_stopping=True,
+            # max_new_tokens=1024,
+            # top_k=50, 
+            # top_p=0.93, 
+            
+            # Contrastive search
+            # penalty_alpha=0.6,
+            # top_k=4,
+            # max_new_tokens=1024,
+            # early_stopping=True,
+            
         )
         generated_code = tokenizer.decode(output_ids[0], skip_special_tokens=True).split("ANSWER:\n")[1]
         generated_codes[idx] = {"problem_id": coding_problem["problem_id"], "answer": generated_code}
