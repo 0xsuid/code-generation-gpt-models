@@ -77,9 +77,6 @@ for idx, coding_problem in enumerate(coding_problems):
         continue
 
     try:
-        # https://arxiv.org/pdf/2202.06417.pdf - pg9
-        # when α ∈ [0.5, 0.8], it yields generation diversity and
-        # perplexity that are both comparable to human performance
         output_ids = model.generate(
             input_ids,
             
@@ -125,6 +122,9 @@ for idx, coding_problem in enumerate(coding_problems):
             # top_p=0.93, 
             
             # Contrastive search
+            # https://arxiv.org/pdf/2202.06417.pdf - pg9
+            # when α ∈ [0.5, 0.8], it yields generation diversity and
+            # perplexity that are both comparable to human performance
             
             # penalty_alpha=0.6,
             # top_k=4,
