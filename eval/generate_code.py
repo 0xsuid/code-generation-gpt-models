@@ -41,7 +41,7 @@ def format_input(dataset):
                 formatted_dataset.append({"problem_id": data["problem_id"], "question": str_format, "input_output": data["input_output"]})
         return formatted_dataset
 
-# No. of problems in each difficulty set
+# No. of problems in each difficulty - test set
 # introductory - 1000
 # interview - 3000
 # competition - 1000
@@ -57,7 +57,7 @@ if(args.limit and args.limit>0):
         coding_problems = coding_problems[:args.limit]
 
 if(args.single):
-        coding_problems = [coding_problems[args.single]]
+    coding_problems = [coding_problems[args.single]]
 
 print("Total Coding Problems: ",len(raw_ds))
 
@@ -84,6 +84,7 @@ for idx, coding_problem in enumerate(coding_problems):
             input_ids,
             
             # beam search
+            
             num_beams=5,
             do_sample=True,
             early_stopping=True,
@@ -93,6 +94,7 @@ for idx, coding_problem in enumerate(coding_problems):
             # max_length=2047
             
             # sample
+            
             # do_sample=True, 
             # max_new_tokens=1024,
             # top_k=0, 
@@ -100,12 +102,14 @@ for idx, coding_problem in enumerate(coding_problems):
             # early_stopping=True,
             
             # top-k
+            
             # do_sample=True, 
             # early_stopping=True,
             # max_new_tokens=1024,
             # top_k=50,
             
             # top-p
+            
             # do_sample=True, 
             # early_stopping=True,
             # max_new_tokens=1024,
@@ -113,6 +117,7 @@ for idx, coding_problem in enumerate(coding_problems):
             # top_k=0
             
             # top-p+top-k
+            
             # do_sample=True, 
             # early_stopping=True,
             # max_new_tokens=1024,
@@ -120,6 +125,7 @@ for idx, coding_problem in enumerate(coding_problems):
             # top_p=0.93, 
             
             # Contrastive search
+            
             # penalty_alpha=0.6,
             # top_k=4,
             # max_new_tokens=1024,
