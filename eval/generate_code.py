@@ -86,7 +86,7 @@ for idx, coding_problem in enumerate(coding_problems):
             do_sample=True,
             early_stopping=True,
             max_new_tokens=1024,
-            # no_repeat_ngram_size=2, 
+            no_repeat_ngram_size=2, 
             # num_return_sequences=5, 
             # max_length=2047
             

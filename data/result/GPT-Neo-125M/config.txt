@@ -1,0 +1,5 @@
+num_beams=5,
+do_sample=True,
+early_stopping=True,
+max_new_tokens=1024,
+no_repeat_ngram_size=2, 

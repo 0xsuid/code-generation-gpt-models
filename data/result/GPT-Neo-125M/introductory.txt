@@ -1,0 +1,5 @@
+number of compile errors = 226 avg = 0.226
+number of runtime errors = 510 avg = 0.51
+number of problems evaluated = 1000
+Average Accuracy : 0.021621035902205415
+Strict Accuracy : 0.0
